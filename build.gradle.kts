@@ -79,18 +79,17 @@ tasks.test {
    SSH CONFIG
    ========================= */
 
-configure<org.hidetake.gradle.ssh.plugin.SshPluginExtension> {
-
+ssh.settings {
     knownHosts = allowAnyHosts
+}
 
-    remotes {
-        create("host") {
-            host = "192.168.59.138"
-            user = "hung"
+remotes {
 
-            // password server ubuntu
-            password = "123"
-        }
+    create("host") {
+
+        host = "192.168.59.138"
+        user = "hung"
+        password = "123"
     }
 }
 
@@ -108,15 +107,9 @@ tasks.register("docker_app_start") {
 
             session(remotes["host"]) {
 
-                execute(
-                    "docker stop tomcat9",
-                    mapOf("ignoreError" to true)
-                )
+                execute("docker stop tomcat9", ignoreError = true)
 
-                execute(
-                    "docker rm tomcat9",
-                    mapOf("ignoreError" to true)
-                )
+                execute("docker rm tomcat9", ignoreError = true)
 
                 execute(
                     """
@@ -148,14 +141,13 @@ tasks.register("docker_upload_file_to_server") {
 
             session(remotes["host"]) {
 
-                execute("rm -rf /opt/deploy/ROOT")
-                execute("rm -f /opt/deploy/lab.war")
+                execute("rm -rf /opt/deploy/ROOT", ignoreError = true)
+
+                execute("rm -f /opt/deploy/lab.war", ignoreError = true)
 
                 put(
-                    hashMapOf(
-                        "from" to file("${project.projectDir}/build/libs/TTLTW_Nhom6-1.0-SNAPSHOT.war"),
-                        "into" to "/opt/deploy/lab.war"
-                    )
+                    from = file("${project.projectDir}/build/libs/TTLTW_Nhom6-1.0-SNAPSHOT.war"),
+                    into = "/opt/deploy/lab.war"
                 )
             }
         }
@@ -169,9 +161,10 @@ tasks.register("docker_upload_file_to_server") {
 tasks.register("docker_deploy") {
 
     dependsOn("build")
-    dependsOn("docker_app_start")
     dependsOn("docker_upload_file_to_server")
+    dependsOn("docker_app_start")
+}
 
-    tasks.getByName("docker_app_start")
-        .mustRunAfter("docker_upload_file_to_server")
+tasks.named("docker_app_start") {
+    mustRunAfter("docker_upload_file_to_server")
 }
