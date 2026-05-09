@@ -63,7 +63,7 @@ tasks.register('docker_app_start') {
                     --name tomcat9 \
                     -v /opt/deploy:/usr/local/tomcat/webapps \
                     -p 80:8080 \
-                    tomcat:9.0
+                   tomcat:10.1-jdk21
                 """.stripIndent())
             }
         }
