@@ -16,12 +16,12 @@ repositories {
 
 dependencies {
 
-    // Servlet API
-    compileOnly("jakarta.servlet:jakarta.servlet-api:6.1.0")
+    // Jakarta Servlet - dùng implementation để IntelliJ nhận đúng
+    implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
 
-    // JSTL
-    implementation("jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.1")
+    // JSTL Jakarta
     implementation("org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1")
+    implementation("jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0")
 
     // MySQL
     implementation("mysql:mysql-connector-java:8.0.33")
@@ -51,8 +51,8 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_20
-    targetCompatibility = JavaVersion.VERSION_20
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 publishing {
@@ -117,7 +117,7 @@ tasks.register("docker_app_start") {
                     --name tomcat9 \
                     -v /opt/deploy:/usr/local/tomcat/webapps \
                     -p 80:8080 \
-                    tomcat:9.0
+                    tomcat:10.1
                     """.trimIndent()
                 )
             }

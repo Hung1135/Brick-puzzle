@@ -1,17 +1,33 @@
 import org.hidetake.groovy.ssh.core.Service
 
 plugins {
-    id("java")
-    id("war")
-    id("maven-publish")
-    id("org.hidetake.ssh") version "2.11.2"
+    id 'java'
+    id 'war'
+    id 'maven-publish'
+    id 'org.hidetake.ssh' version '2.11.2'
 }
 
-group = "vn.edu.hcmuaf.fit"
-version = "1.0-SNAPSHOT"
+group = 'vn.edu.hcmuaf.fit'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+dependencies {
+
+    // Servlet API (Tomcat 10 / Jakarta)
+    providedCompile 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // JDBI
+    implementation 'org.jdbi:jdbi3-core:3.45.1'
+    implementation 'org.jdbi:jdbi3-sqlobject:3.45.1'
+
+    // MySQL
+    implementation 'mysql:mysql-connector-java:8.0.33'
 }
 
 ssh.settings {
@@ -19,10 +35,10 @@ ssh.settings {
 }
 
 remotes {
-    create("server") {
-        host = "192.168.59.138"
-        user = "hung"
-        password = "123"
+    server {
+        host = '192.168.59.138'
+        user = 'hung'
+        password = '123'
     }
 }
 
@@ -30,27 +46,25 @@ remotes {
    START TOMCAT
    ========================= */
 
-tasks.register("docker_app_start") {
+tasks.register('docker_app_start') {
 
     doLast {
 
         ssh.run {
 
-            session(remotes["server"]) {
+            session(remotes.server) {
 
-                execute("docker stop tomcat9", ignoreError = true)
+                execute('docker stop tomcat9', ignoreError: true)
 
-                execute("docker rm tomcat9", ignoreError = true)
+                execute('docker rm tomcat9', ignoreError: true)
 
-                execute(
-                        """
+                execute("""
                     docker run -d \
                     --name tomcat9 \
                     -v /opt/deploy:/usr/local/tomcat/webapps \
                     -p 80:8080 \
                     tomcat:9.0
-                    """.trimIndent()
-                )
+                """.stripIndent())
             }
         }
     }
@@ -60,23 +74,23 @@ tasks.register("docker_app_start") {
    UPLOAD WAR
    ========================= */
 
-tasks.register("docker_upload_file_to_server") {
+tasks.register('docker_upload_file_to_server') {
 
-    dependsOn("war")
+    dependsOn 'war'
 
     doLast {
 
         ssh.run {
 
-            session(remotes["server"]) {
+            session(remotes.server) {
 
-                execute("mkdir -p /opt/deploy")
+                execute('mkdir -p /opt/deploy')
 
-                execute("rm -f /opt/deploy/brick-puzzle.war", ignoreError = true)
+                execute('rm -f /opt/deploy/brick-puzzle.war', ignoreError: true)
 
                 put(
-                        from = file("${project.projectDir}/build/libs/Brick-puzzle-1.0-SNAPSHOT.war"),
-                        into = "/opt/deploy/brick-puzzle.war"
+                        from: file("${project.projectDir}/build/libs/TTLTW_Nhom6-1.0-SNAPSHOT.war"),
+                        into: '/opt/deploy/brick-puzzle.war'
                 )
             }
         }
@@ -87,12 +101,12 @@ tasks.register("docker_upload_file_to_server") {
    DEPLOY
    ========================= */
 
-tasks.register("docker_deploy") {
+tasks.register('docker_deploy') {
 
-    dependsOn("docker_upload_file_to_server")
-    dependsOn("docker_app_start")
+    dependsOn 'docker_upload_file_to_server'
+    dependsOn 'docker_app_start'
 }
 
-tasks.named("docker_app_start") {
-    mustRunAfter("docker_upload_file_to_server")
+tasks.named('docker_app_start') {
+    mustRunAfter 'docker_upload_file_to_server'
 }
