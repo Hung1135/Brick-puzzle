@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
 
-    // Servlet API (Tomcat 10 / Jakarta)
+    // Servlet API
     providedCompile 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
     // Gson
@@ -50,7 +50,7 @@ tasks.register('docker_app_start') {
 
     doLast {
 
-        ssh.run {
+        project.ssh.run {
 
             session(remotes.server) {
 
@@ -80,7 +80,7 @@ tasks.register('docker_upload_file_to_server') {
 
     doLast {
 
-        ssh.run {
+        project.ssh.run {
 
             session(remotes.server) {
 
