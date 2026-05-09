@@ -1,0 +1,17 @@
+{
+  "name": "ltw_nhom5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Truc350/WebTruyenTranh.git"
+  },
+  "private": true,
+  "dependencies": {
+    "firebase": "^12.7.0"
+  }
+}
